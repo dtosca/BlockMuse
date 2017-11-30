@@ -1,0 +1,139 @@
+.text {
+  /*specifies the appearance of the background*/
+  background-image: "./Media/pinRed.png";
+  background-clip: padding-box;
+  background-repeat: no-repeat;
+  background-size: 25px auto;
+  background-color: #32B3EC;
+  padding: 5px;
+  padding-bottom: -10px;
+  resize-to-content: true;
+
+  /*specifies the appearance of the text*/
+  /*stroke-width: 100px;
+  stroke: white;
+  font-family: sans-serif;
+  font-weight: bold;
+  font-size: 100px;*/
+  wrap-mode: none;
+  
+}
+
+
+#w1 {
+  background-position: 70 1, center top;
+  text: "HCI";
+  color: #ED8500;
+  location: 620px 75px;
+  rotation: -10deg;
+
+  stroke-width: 5px;
+  stroke: white;
+  font-family: sans-serif;
+  font-weight: bold;
+  font-size: 100px;
+  
+}
+#w2 {
+  background-position: 75 2, center top;
+  text: "Lab";
+  color: #B1D500;
+  location: 845px 40px;
+
+  stroke-width: 5px;
+  stroke: white;
+  font-family: sans-serif;
+  font-weight: bold;
+  font-size: 100px;
+  
+  
+}
+#w3 {
+  background-position: 87 2, center top;
+  text: "Bulletin";
+  color: #11D52D;
+  location: 1080px 45px;
+  rotation: 10deg;
+
+  stroke-width: 5px;
+  stroke: white;
+  font-family: sans-serif;
+  font-weight: bold;
+  font-size: 100px;
+  
+}
+#w4 {
+  background-position: 77 1, center top;
+  text: "#TUI";
+  color: #F1D52D;
+  location: 200px 650px;
+  rotation: 290deg;
+  padding: 13px;
+  padding-bottom: -8px;
+
+  stroke-width: 5px;
+  stroke: white;
+  font-family: sans-serif;
+  font-weight: bold;
+  font-size: 100px;
+  fixed: true;
+  
+  
+}
+
+VideoWidget {
+  background-image: "./Media/pinGreen.png";
+  background-clip: padding-box;
+  background-repeat: no-repeat;
+  background-size: 25px auto;
+  /*background-position: center top;
+  background-color: white;
+  padding: 15px;
+  padding-top: 20px;*/
+
+  stroke-width: 2px;
+  stroke: white;
+  font-family: sans-serif;
+  font-weight: bold;
+  font-size: 16px;
+  wrap-mode: none;
+}
+
+.ImageW {
+  background-image: "./Media/pinBlue.png";
+  background-clip: padding-box;
+  background-repeat: no-repeat;
+  background-size: 25px auto;
+  background-position: center top;
+  background-color: white;
+  padding: 15px;
+  padding-top: 20px;
+  /*font-size: 20px;*/
+}
+
+
+
+BookWidget {
+  background-image: "./Media/pinYellow.png";
+  background-clip: padding-box;
+  background-repeat: no-repeat;
+  background-size: 25px auto;
+  background-position: center top;
+  background-color: white;
+  padding: 15px;
+  padding-top: 20px;
+  width: 250px;
+}
+
+ItemFlowWidget {
+  background-image: "./Media/pinOrange.png";
+  background-clip: padding-box;
+  background-repeat: no-repeat;
+  background-size: 25px auto;
+  background-position: center top;
+  background-color: white;
+  padding: 10px;
+  padding-top: 5px;
+  font-size: 20px;
+  
+}
