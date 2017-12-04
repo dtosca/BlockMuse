@@ -131,7 +131,7 @@ function initializePlayButton(image){
 	    w.setHeight(height);
 	    w.setLocation(LocX,LocY);
     	root.addChild(w);
-    	w.raiseToTop();
+    	//w.raiseToTop();
     	w.setFixed();
 	}
 
@@ -193,7 +193,11 @@ function markerSensorPlay(locationx, locationy, height, width){
 		var marker = gm.findMarker(idAsInt);
 		if(marker.code()==9){
 			console.log("**************** marker down: x: "+ marker.centerLocation().x+" y: "+marker.centerLocation().y+" *****************");
-			audioPlay("Media/beep.wav");
+			for (index in notesPlayed){
+				console.log(notesPlayed[index]);
+				playNote(notesPlayed[index]);
+			}
+
 		}
 	});
 
@@ -225,6 +229,7 @@ function markerSensorPlay(locationx, locationy, height, width){
 	var quarterNotPlayed = true;
 	var halfNotPlayed = true;
 	var wholeNotPlayed = true;
+	var notesPlayed = [];
 
 	function markerSensorStaff(locationx, locationy, height, width){
 	console.log("Placing staff marker sensor...");
@@ -248,9 +253,6 @@ function markerSensorPlay(locationx, locationy, height, width){
 
 			console.log("X LOCATION: "+xLoc);
 			console.log("Y LOCATION: "+yLoc);
-
-			console.log(".......................................CHECKING BOOLEAN VALUES....................................");
-
 			console.log("eightNotPlayed value: "+eighthNotPlayed);
 			console.log("quarterNotPlayed value: "+quarterNotPlayed);
 			console.log("halfNotPlayed value: "+halfNotPlayed);
@@ -261,25 +263,31 @@ function markerSensorPlay(locationx, locationy, height, width){
 				var eighthNote = getNote(yLoc);
 				var eighthBar = getBar(xLoc,yLoc);
 				playNote(eighthNote);
+				notesPlayed.push(eighthNote);
 			}
 			if(quarterNotPlayed && marker.code()==2){
 				quarterNotPlayed = false;
 				var quarterNote = getNote(yLoc);
 				var quarterBar = getBar(xLoc,yLoc);
 				playNote(quarterNote);
+				notesPlayed.push(quarterNote);
 			}
 			if(halfNotPlayed && marker.code()==3){
 				halfNotPlayed = false;
 				var halfNote = getNote(yLoc);
 				var halfBar = getBar(xLoc,yLoc);
 				playNote(halfNote);
+				notesPlayed.push(halfNote);
 			}
 			if(wholeNotPlayed && marker.code()==4){
 				wholeNotPlayed = false;
 				var wholeNote = getNote(yLoc);
 				var wholeBar = getBar(xLoc,yLoc);
 				playNote(wholeNote);
+				notesPlayed.push(wholeNote);
 			}
+			console.log("..............................................NOTES PLAYED ARRAY............................................");
+			console.log(notesPlayed);
 		}
 	});
 
