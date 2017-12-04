@@ -260,21 +260,25 @@ function markerSensorPlay(locationx, locationy, height, width){
 				eighthNotPlayed = false;
 				var eighthNote = getNote(yLoc);
 				var eighthBar = getBar(xLoc,yLoc);
+				playNote(eighthNote);
 			}
 			if(quarterNotPlayed && marker.code()==2){
 				quarterNotPlayed = false;
 				var quarterNote = getNote(yLoc);
 				var quarterBar = getBar(xLoc,yLoc);
+				playNote(quarterNote);
 			}
 			if(halfNotPlayed && marker.code()==3){
 				halfNotPlayed = false;
 				var halfNote = getNote(yLoc);
 				var halfBar = getBar(xLoc,yLoc);
+				playNote(halfNote);
 			}
 			if(wholeNotPlayed && marker.code()==4){
 				wholeNotPlayed = false;
 				var wholeNote = getNote(yLoc);
 				var wholeBar = getBar(xLoc,yLoc);
+				playNote(wholeNote);
 			}
 		}
 	});
@@ -292,6 +296,36 @@ function markerSensorPlay(locationx, locationy, height, width){
 	markerSensorStaff.raiseToTop();
 	}
 
+	function playNote(noteName){
+		if(noteName == "E4"){
+			audioPlay("Media/E4.wav");
+		}
+		if(noteName == "F4"){
+			audioPlay("Media/F4.wav");
+		}
+		if(noteName == "G4"){
+			audioPlay("Media/G4.wav");
+		}
+		if(noteName == "A4"){
+			audioPlay("Media/A4.wav");
+		}
+		if(noteName == "B4"){
+			audioPlay("Media/B4.wav");
+		}
+		if(noteName == "C5"){
+			audioPlay("Media/C5.wav");
+		}
+		if(noteName == "D5"){
+			audioPlay("Media/D5.wav");
+		}
+		if(noteName == "E5"){
+			audioPlay("Media/E5.wav");
+		}
+		if(noteName == "F5"){
+			audioPlay("Media/F5.wav");
+		}
+	}
+
 	function getNote(yLoc){
 		//Note heights, scientific pitch notation names
 		var E4 = {start:635,end:670};
@@ -306,47 +340,38 @@ function markerSensorPlay(locationx, locationy, height, width){
 
 		if(yLoc >= E4.start && yLoc <= E4.end){
 			console.log("Note is E4");
-			audioPlay("Media/E4.wav");
 			return "E4";
 		}
 		else if(yLoc >= F4.start && yLoc <= F4.end){
 			console.log("Note is F4");
-			audioPlay("Media/F4.wav");
 			return "F4";
 		}
 		else if(yLoc >= G4.start && yLoc <= G4.end){
 			console.log("Note is G4");
-			audioPlay("Media/G4.wav");
 			return "G4";
 		}
 		else if(yLoc >= A4.start && yLoc <= A4.end){
 			console.log("Note is A4");
-			audioPlay("Media/A4.wav");
 			return "A4";
 		}
 		else if(yLoc >= B4.start && yLoc <= B4.end){
 			console.log("Note is B4");
-			audioPlay("Media/B4.wav");
 			return "B4";
 		}
 		else if(yLoc >= C5.start && yLoc <= C5.end){
 			console.log("Note is C5");
-			audioPlay("Media/C5.wav");
 			return "C5";
 		}
 		else if(yLoc >= D5.start && yLoc <= D5.end){
 			console.log("Note is D5");
-			audioPlay("Media/D5.wav");
 			return "D5";
 		}
 		else if(yLoc >= E5.start && yLoc <= E5.end){
 			console.log("Note is E5");
-			audioPlay("Media/E5.wav");
 			return "E5";
 		}
 		else if(yLoc >= F5.start && yLoc <= F5.end){
 			console.log("Note is F5");
-			audioPlay("Media/F5.wav");
 			return "F5";
 		}
 		else {
