@@ -123,7 +123,8 @@ function initializePlayButton(image){
 	var width = root.width()*.09;
 	var height = root.height()*.085;
 
-	markerSensorPlay(LocX,LocY,height,width);
+	console.log("Calling markerSensorPlay....");
+	markerSensorPlay(LocX,LocY,height,width,w);
 
 	//load background image in and format
 	if (w.load("images/"+image)) {
@@ -136,26 +137,26 @@ function initializePlayButton(image){
 	}
 
 	//check status of lit to determine if clicking "lights" or "unlights"
-	if (lit == false) {
-		w.onSingleTap(function(){
-			console.log("on single tap before reassign" + lit.toString());
-			lit = true;
-			console.log("after reassign" + lit.toString());
-			w.setSource("images/gPlay.png");
-		});
-			
+		// if (lit == false) {
+		// 	w.onSingleTap(function(){
+		// 		console.log("on single tap before reassign" + lit.toString());
+		// 		lit = true;
+		// 		console.log("after reassign" + lit.toString());
+		// 		w.setSource("images/gPlay.png");
+		// 	});
+				
+		// }
+
+		// 	else {
+		// 		w.onSingleTap(function(){
+		// 			console.log("unlight"); 
+		// 			console.log("inside On single tap");
+		// 			w.setSource("images/play.png")});
+		// 		lit = false;
+		// 	}
+
+		return w;
 	}
-
-		else {
-			w.onSingleTap(function(){
-				console.log("unlight"); 
-				console.log("inside On single tap");
-				w.setSource("images/play.png")});
-			lit = false;
-		}
-
-	return w;
-}
 
 function addImage(image, x, y){
 	var w = new MultiWidgets.ImageWidget();
@@ -177,22 +178,32 @@ function audioPlay(file){
 	dsp.samplePlayer().playSample(file, 1.0, 1.0, 0, 0);	
 }
 
-function markerSensorPlay(locationx, locationy, height, width){
+function markerSensorPlay(locationx, locationy, height, width, w){
 	var markerSensorPlay = new MultiWidgets.JavaScriptWidget();
 	//place marker sensor directly over the play button
 	console.log("Placing play button marker sensor...");
 	markerSensorPlay.setLocation(locationx, locationy);
-	markerSensorPlay.setHeight(height);
-	markerSensorPlay.setWidth(width);
-	markerSensorPlay.setFixed();
-	markerSensorPlay.setBackgroundColor(1.0,1.0,.53,1.0);
+	markerSensorPlay.setHeight(height+10);
+	markerSensorPlay.setWidth(width+10);
+	markerSensorPlay.setFixed();	
+	markerSensorPlay.raiseToTop();
+	markerSensorPlay.setBackgroundColor(1.0,1.0,.53,0.0);
 
 	markerSensorPlay.onMarkerDown(function(id_as_string) {
+		console.log("Inside function on Marker down...");
 		var idAsInt = parseInt(id_as_string);
 		var gm = $.app.grabManager();
 		var marker = gm.findMarker(idAsInt);
+		//marker code 9 is play button
 		if(marker.code()==9){
 			console.log("**************** marker down: x: "+ marker.centerLocation().x+" y: "+marker.centerLocation().y+" *****************");
+			if (lit == false) {
+				console.log("on single tap before reassign" + lit.toString());
+				lit = true;
+				console.log("after reassign" + lit.toString());
+				w.setSource("images/gPlay.png");
+		}
+			console.log("Playing audio........");
 			audioPlay("Media/beep.wav");
 		}
 	});
@@ -205,10 +216,21 @@ function markerSensorPlay(locationx, locationy, height, width){
 			console.log("****************** marker up *******************");
 		}
 	});
-
+	
+	console.log("Adding markerSensorPlay to root....");
 	root.addChild(markerSensorPlay);
-	markerSensorPlay.raiseToTop();
+
 	}
+
+	function markerSensorStaff(locationx, locationy, height, width){
+	console.log("Placing staff marker sensor...");
+	var markerSensorStaff = new MultiWidgets.JavaScriptWidget();
+	//place marker sensor directly over the staff
+	markerSensorStaff.setLocation(locationx, locationy);
+	markerSensorStaff.setHeight(height);
+	markerSensorStaff.setWidth(width);
+	markerSensorStaff.setBackgroundColor(0.0,0.0,0.0,0.0);
+	markerSensorStaff.setFixed();
 
 	//note mappings for maker codes:
 	// 1 eighth note soil
@@ -226,55 +248,38 @@ function markerSensorPlay(locationx, locationy, height, width){
 	var halfNotPlayed = true;
 	var wholeNotPlayed = true;
 
-	function markerSensorStaff(locationx, locationy, height, width){
-	console.log("Placing staff marker sensor...");
-	var markerSensorStaff = new MultiWidgets.JavaScriptWidget();
-	//place marker sensor directly over the staff
-	markerSensorStaff.setLocation(locationx, locationy);
-	markerSensorStaff.setHeight(height);
-	markerSensorStaff.setWidth(width);
-	markerSensorStaff.setBackgroundColor(0.0,0.0,0.0,0.0);
-	markerSensorStaff.setFixed();
-
 	markerSensorStaff.onMarkerDown(function(id_as_string) {
 		var idAsInt = parseInt(id_as_string);
 		var gm = $.app.grabManager();
 		var marker = gm.findMarker(idAsInt);
-		if(marker.code()==1 || marker.code()==2 || marker.code()==3 || marker.code()==4){
-			console.log("Marker code is :"+marker.code());
-
+		if(marker.code()==1 || marker.code()==2 || marker.code()==3 || marker.code()==4 || marker.code()==5 || marker.code()==6 || marker.code()==7 || marker.code()==8){
+			console.log("Markser code is :"+marker.code());
 			var xLoc = marker.centerLocation().x;
 			var yLoc = marker.centerLocation().y;
-
 			console.log("X LOCATION: "+xLoc);
 			console.log("Y LOCATION: "+yLoc);
-
-			console.log(".......................................CHECKING BOOLEAN VALUES....................................");
-
-			console.log("eightNotPlayed value: "+eighthNotPlayed);
-			console.log("quarterNotPlayed value: "+quarterNotPlayed);
-			console.log("halfNotPlayed value: "+halfNotPlayed);
-			console.log("wholeNotPlayed value: "+wholeNotPlayed);
-
-			if(eighthNotPlayed && marker.code()==1){
-				eighthNotPlayed = false;
-				var eighthNote = getNote(yLoc);
-				var eighthBar = getBar(xLoc,yLoc);
-			}
-			if(quarterNotPlayed && marker.code()==2){
-				quarterNotPlayed = false;
-				var quarterNote = getNote(yLoc);
-				var quarterBar = getBar(xLoc,yLoc);
-			}
-			if(halfNotPlayed && marker.code()==3){
-				halfNotPlayed = false;
-				var halfNote = getNote(yLoc);
-				var halfBar = getBar(xLoc,yLoc);
-			}
-			if(wholeNotPlayed && marker.code()==4){
-				wholeNotPlayed = false;
-				var wholeNote = getNote(yLoc);
-				var wholeBar = getBar(xLoc,yLoc);
+			
+			if(marker.code()==1 || marker.code()==2 || marker.code()==3 || marker.code()==4){
+				if(eightNotePlayed){
+					eightNotePlayed = false;
+					var note = getNote(yLoc);
+					var bar = getBar(xLoc,yLoc);
+				}
+				if(quarterNotPlayed){
+					quarterNotPlayed = false;
+					var note = getNote(yLoc);
+					var bar = getBar(xLoc,yLoc);
+				}
+				if(halfNotPlayed){
+					halfNotPlayed = false;
+					var note = getNote(yLoc);
+					var bar = getBar(xLoc,yLoc);
+				}
+				if(wholeNotPlayed){
+					wholeNotPlayed = false;
+					var note = getNote(yLoc);
+					var bar = getBar(xLoc,yLoc);
+				}
 			}
 		}
 	});
@@ -380,3 +385,4 @@ function markerSensorPlay(locationx, locationy, height, width){
 			return "Error";
 		}
 	}
+
