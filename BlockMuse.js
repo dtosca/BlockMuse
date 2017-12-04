@@ -174,8 +174,10 @@ function addImage(image, x, y){
 //call to resonant class to play sample
 function audioPlay(file){
 	console.log("Playing sample...");
-	dsp.samplePlayer().playSample(file, 1.0, 1.0, 0, 0);	
+	var sound = dsp.samplePlayer().playSample(file, 1.0, 1.0, 0, 0);
 }
+
+var playNotPressed = true;
 
 function markerSensorPlay(locationx, locationy, height, width){
 	var markerSensorPlay = new MultiWidgets.JavaScriptWidget();
@@ -191,13 +193,14 @@ function markerSensorPlay(locationx, locationy, height, width){
 		var idAsInt = parseInt(id_as_string);
 		var gm = $.app.grabManager();
 		var marker = gm.findMarker(idAsInt);
-		if(marker.code()==9){
+
+		if(marker.code()==9 && playNotPressed){
 			console.log("**************** marker down: x: "+ marker.centerLocation().x+" y: "+marker.centerLocation().y+" *****************");
+			playNotPressed = false;
 			for (index in notesPlayed){
 				console.log(notesPlayed[index]);
 				playNote(notesPlayed[index]);
 			}
-
 		}
 	});
 
