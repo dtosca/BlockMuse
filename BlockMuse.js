@@ -95,7 +95,6 @@ function changeLight(number){
 
 	//given number of beats, light up number amount of lights and add beats to counter.
 	//if number exceeds available (max 8) then turn all to red. 
-	var counter = 0;
 
 }
 
@@ -111,7 +110,6 @@ function initializeLights(){
 	}
 
 	console.log("lights initialized");
-	console.log("light color changed");
 }
 
 //initializes image of the play button
@@ -197,12 +195,28 @@ function markerSensorPlay(locationx, locationy, height, width){
 		if(marker.code()==9 && playNotPressed){
 			console.log("**************** marker down: x: "+ marker.centerLocation().x+" y: "+marker.centerLocation().y+" *****************");
 			playNotPressed = false;
-			for (index in notesPlayed){
-				console.log(notesPlayed[index]);
-				playNote(notesPlayed[index]);
-			}
+			console.log(notesPlayed);
+			console.log(lengthPlayed);
 		}
 	});
+
+	//Recursive note playing function
+	// function playAllNotes(notesPlayed){
+	// 	if(notesPlayed.length == 0){
+	// 		return "";
+	// 	}
+	// 	else{
+	// 		console.log("Array is: ");
+	// 		console.log(notesPlayed);
+	// 		console.log("playing note...."+notesPlayed[0]);
+	// 		playNote(notesPlayed[0]);
+	// 		notesPlayed.shift();
+	// 		console.log("Timestamp...");
+	// 		var d = new Date();
+	// 		console.log(d.getHours()+ " "+d.getSeconds());
+	// 		setTimeout(playAllNotes(notesPlayed),2000);
+	// 	}	
+	// }
 
 	markerSensorPlay.onMarkerUp(function(id_as_string) {
 		var idAsInt = parseInt(id_as_string);
@@ -232,7 +246,12 @@ function markerSensorPlay(locationx, locationy, height, width){
 	var quarterNotPlayed = true;
 	var halfNotPlayed = true;
 	var wholeNotPlayed = true;
+	var eightRestNotPlayed = true;
+	var quarterRestNotPlayed = true;
+	var halfRestNotPlayed = true;
+	var wholeRestNotPlayed = true;
 	var notesPlayed = [];
+	var lengthPlayed = [];
 
 	function markerSensorStaff(locationx, locationy, height, width){
 	console.log("Placing staff marker sensor...");
@@ -248,7 +267,7 @@ function markerSensorPlay(locationx, locationy, height, width){
 		var idAsInt = parseInt(id_as_string);
 		var gm = $.app.grabManager();
 		var marker = gm.findMarker(idAsInt);
-		if(marker.code()==1 || marker.code()==2 || marker.code()==3 || marker.code()==4){
+		if(marker.code()==1 || marker.code()==2 || marker.code()==3 || marker.code()==4 || marker.code()==5 || marker.code()==6 || marker.code()==7 || marker.code()==8 ){
 			console.log("Marker code is :"+marker.code());
 
 			var xLoc = marker.centerLocation().x;
@@ -256,39 +275,64 @@ function markerSensorPlay(locationx, locationy, height, width){
 
 			console.log("X LOCATION: "+xLoc);
 			console.log("Y LOCATION: "+yLoc);
-			console.log("eightNotPlayed value: "+eighthNotPlayed);
-			console.log("quarterNotPlayed value: "+quarterNotPlayed);
-			console.log("halfNotPlayed value: "+halfNotPlayed);
-			console.log("wholeNotPlayed value: "+wholeNotPlayed);
 
 			if(eighthNotPlayed && marker.code()==1){
 				eighthNotPlayed = false;
 				var eighthNote = getNote(yLoc);
 				var eighthBar = getBar(xLoc,yLoc);
-				playNote(eighthNote);
+				playNote(eighthNote,"eighth");
 				notesPlayed.push(eighthNote);
+				lengthPlayed.push("eighth");
 			}
 			if(quarterNotPlayed && marker.code()==2){
 				quarterNotPlayed = false;
 				var quarterNote = getNote(yLoc);
 				var quarterBar = getBar(xLoc,yLoc);
-				playNote(quarterNote);
+				playNote(quarterNote,"quarter");
 				notesPlayed.push(quarterNote);
+				lengthPlayed.push("quarter");
 			}
 			if(halfNotPlayed && marker.code()==3){
 				halfNotPlayed = false;
 				var halfNote = getNote(yLoc);
 				var halfBar = getBar(xLoc,yLoc);
-				playNote(halfNote);
+				playNote(halfNote,"half");
 				notesPlayed.push(halfNote);
+				lengthPlayed.push("half");
 			}
 			if(wholeNotPlayed && marker.code()==4){
 				wholeNotPlayed = false;
 				var wholeNote = getNote(yLoc);
 				var wholeBar = getBar(xLoc,yLoc);
-				playNote(wholeNote);
+				playNote(wholeNote,"whole");
 				notesPlayed.push(wholeNote);
+				lengthPlayed.push("whole");
 			}
+			if(eightRestNotPlayed && marker.code()==5){
+				eightRestNotPlayed = false;
+				playRest("eighth");
+				notesPlayed.push("rest");
+				lengthPlayed.push("eighth");
+			}
+			if(quarterRestNotPlayed && marker.code()==6){
+				quarterRestNotPlayed = false;
+				playRest("quarter");
+				notesPlayed.push("rest");
+				lengthPlayed.push("quarter");
+			}
+			if(halfRestNotPlayed && marker.code()==7){
+				halfRestNotPlayed = false;
+				playRest("half");
+				notesPlayed.push("rest");
+				lengthPlayed.push("half");
+			}
+			if(wholeRestNotPlayed && marker.code()==8){
+				wholeRestNotPlayed = false;
+				playRest("whole");
+				notesPlayed.push("rest");
+				lengthPlayed.push("whole");
+			}
+
 			console.log("..............................................NOTES PLAYED ARRAY............................................");
 			console.log(notesPlayed);
 		}
@@ -307,33 +351,138 @@ function markerSensorPlay(locationx, locationy, height, width){
 	markerSensorStaff.raiseToTop();
 	}
 
-	function playNote(noteName){
-		if(noteName == "E4"){
-			audioPlay("Media/E4.wav");
+	function playRest(restLength){
+		if(restLength == "eighth"){
+			audioPlay("Notes/8thRest.wav");
 		}
-		if(noteName == "F4"){
-			audioPlay("Media/F4.wav");
+		if(restLength == "quarter"){
+			audioPlay("Notes/rest.wav");
 		}
-		if(noteName == "G4"){
-			audioPlay("Media/G4.wav");
+		if(restLength == "half"){
+			audioPlay("Notes/halfRest.wav");
 		}
-		if(noteName == "A4"){
-			audioPlay("Media/A4.wav");
+		if(restLength == "whole"){
+			audioPlay("Notes/fullRest.wav");
 		}
-		if(noteName == "B4"){
-			audioPlay("Media/B4.wav");
+	}
+
+	function playNote(noteName,noteLength){
+		if(noteLength=="eighth"){
+			if(noteName == "E4"){
+			audioPlay("Notes/8thE4.wav");
+			}
+			if(noteName == "F4"){
+				audioPlay("Notes/8thF4.wav");
+			}
+			if(noteName == "G4"){
+				audioPlay("Notes/8thG4.wav");
+			}
+			if(noteName == "A4"){
+				audioPlay("Notes/8thA4.wav");
+			}
+			if(noteName == "B4"){
+				audioPlay("Notes/8thB4.wav");
+			}
+			if(noteName == "C5"){
+				audioPlay("Notes/8thC5.wav");
+			}
+			if(noteName == "D5"){
+				audioPlay("Notes/8thD5.wav");
+			}
+			if(noteName == "E5"){
+				audioPlay("Notes/8thE5.wav");
+			}
+			if(noteName == "F5"){
+				audioPlay("Notes/8thF5.wav");
+			}
 		}
-		if(noteName == "C5"){
-			audioPlay("Media/C5.wav");
+		if(noteLength=="quarter"){
+			if(noteName == "E4"){
+			audioPlay("Notes/E4.wav");
+			}
+			if(noteName == "F4"){
+				audioPlay("Notes/F4.wav");
+			}
+			if(noteName == "G4"){
+				audioPlay("Notes/G4.wav");
+			}
+			if(noteName == "A4"){
+				audioPlay("Notes/A4.wav");
+			}
+			if(noteName == "B4"){
+				audioPlay("Notes/B4.wav");
+			}
+			if(noteName == "C5"){
+				audioPlay("Notes/C5.wav");
+			}
+			if(noteName == "D5"){
+				audioPlay("Notes/D5.wav");
+			}
+			if(noteName == "E5"){
+				audioPlay("Notes/E5.wav");
+			}
+			if(noteName == "F5"){
+				audioPlay("Notes/F5.wav");
+			}
 		}
-		if(noteName == "D5"){
-			audioPlay("Media/D5.wav");
+		if(noteLength=="half"){
+			console.log("In note length half");
+			if(noteName == "E4"){
+			audioPlay("Notes/halfE4.wav");
+			}
+			if(noteName == "F4"){
+				audioPlay("Notes/halfF4.wav");
+			}
+			if(noteName == "G4"){
+				audioPlay("Notes/halfG4.wav");
+			}
+			if(noteName == "A4"){
+				audioPlay("Notes/halfA4.wav");
+			}
+			if(noteName == "B4"){
+				audioPlay("Notes/halfB4.wav");
+			}
+			if(noteName == "C5"){
+				audioPlay("Notes/halfC5.wav");
+			}
+			if(noteName == "D5"){
+				audioPlay("Notes/halfD5.wav");
+			}
+			if(noteName == "E5"){
+				audioPlay("Notes/halfE5.wav");
+			}
+			if(noteName == "F5"){
+				audioPlay("Notes/halfF5.wav");
+			}
 		}
-		if(noteName == "E5"){
-			audioPlay("Media/E5.wav");
-		}
-		if(noteName == "F5"){
-			audioPlay("Media/F5.wav");
+		if(noteLength=="whole"){
+			if(noteName == "E4"){
+			audioPlay("Notes/fullE4.wav");
+			}
+			if(noteName == "F4"){
+				audioPlay("Notes/fullF4.wav");
+			}
+			if(noteName == "G4"){
+				audioPlay("Notes/fullG4.wav");
+			}
+			if(noteName == "A4"){
+				audioPlay("Notes/fullA4.wav");
+			}
+			if(noteName == "B4"){
+				audioPlay("Notes/fullB4.wav");
+			}
+			if(noteName == "C5"){
+				audioPlay("Notes/fullC5.wav");
+			}
+			if(noteName == "D5"){
+				audioPlay("Notes/fullD5.wav");
+			}
+			if(noteName == "E5"){
+				audioPlay("Notes/fullE5.wav");
+			}
+			if(noteName == "F5"){
+				audioPlay("Notes/fullF5.wav");
+			}
 		}
 	}
 
