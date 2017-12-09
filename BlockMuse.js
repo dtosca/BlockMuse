@@ -91,11 +91,16 @@ function createInstructions(){
 
 //function to change the color of lights when a note is placed
 //dependent on marker sensor of note (what LENGTH and what POSITION)
-function changeLight(number){
-
+function changeLightsBarOne(){
+	var x = root.width()*0.255;
 	//given number of beats, light up number amount of lights and add beats to counter.
 	//if number exceeds available (max 8) then turn all to red. 
 
+	for(i=0; i<barOneCounter; i++){
+		console.log("PLACEMENT: "+i);
+		addImage("gLED.png", x, root.height()*.65);
+		x += root.width()*.041;
+	}
 }
 
 //function to set up initial unlit-lights under staff
@@ -105,10 +110,8 @@ function initializeLights(){
 	//add 16 lights, adjust x coordinate after each new placement 
 	for(i=0; i<16; i++){
 		 addImage("wLED.png", x, root.height()*.65);
-		//console.log("light: " + i);
 		x += root.width()*.041;
 	}
-
 	console.log("lights initialized");
 }
 
@@ -164,6 +167,19 @@ function addImage(image, x, y){
     	w.setLocation(x,y);
 	    root.addChild(w);
     	w.raiseToTop();
+    	w.setFixed();
+	}
+
+	return w;
+}
+
+function addNoteImage(image, x, y){
+	var w = new MultiWidgets.ImageWidget();
+	if (w.load("images/"+image)) {
+    	w.setLocation(x-100,y-300);
+	    root.addChild(w);
+    	w.raiseToTop();
+    	w.setFixed();
 	}
 
 	return w;
@@ -200,24 +216,6 @@ function markerSensorPlay(locationx, locationy, height, width){
 		}
 	});
 
-	//Recursive note playing function
-	// function playAllNotes(notesPlayed){
-	// 	if(notesPlayed.length == 0){
-	// 		return "";
-	// 	}
-	// 	else{
-	// 		console.log("Array is: ");
-	// 		console.log(notesPlayed);
-	// 		console.log("playing note...."+notesPlayed[0]);
-	// 		playNote(notesPlayed[0]);
-	// 		notesPlayed.shift();
-	// 		console.log("Timestamp...");
-	// 		var d = new Date();
-	// 		console.log(d.getHours()+ " "+d.getSeconds());
-	// 		setTimeout(playAllNotes(notesPlayed),2000);
-	// 	}	
-	// }
-
 	markerSensorPlay.onMarkerUp(function(id_as_string) {
 		var idAsInt = parseInt(id_as_string);
 		var gm = $.app.grabManager();
@@ -252,6 +250,8 @@ function markerSensorPlay(locationx, locationy, height, width){
 	var wholeRestNotPlayed = true;
 	var notesPlayed = [];
 	var lengthPlayed = [];
+	var barOneCounter = 0;
+	var barTwoCounter = 0;
 
 	function markerSensorStaff(locationx, locationy, height, width){
 	console.log("Placing staff marker sensor...");
@@ -264,10 +264,13 @@ function markerSensorPlay(locationx, locationy, height, width){
 	markerSensorStaff.setFixed();
 
 	markerSensorStaff.onMarkerDown(function(id_as_string) {
+		console.log("************************BAR COUNTER*****************************");
+		console.log(barOneCounter);
 		var idAsInt = parseInt(id_as_string);
 		var gm = $.app.grabManager();
 		var marker = gm.findMarker(idAsInt);
-		if(marker.code()==1 || marker.code()==2 || marker.code()==3 || marker.code()==4 || marker.code()==5 || marker.code()==6 || marker.code()==7 || marker.code()==8 ){
+		if(marker.code()==1 || marker.code()==2 || marker.code()==3 || marker.code()==4 || marker.code()==5 || marker.code()==6 || marker.code()==7 || marker.code()==8){
+			console.log("In Marker down");
 			console.log("Marker code is :"+marker.code());
 
 			var xLoc = marker.centerLocation().x;
@@ -283,7 +286,15 @@ function markerSensorPlay(locationx, locationy, height, width){
 				playNote(eighthNote,"eighth");
 				notesPlayed.push(eighthNote);
 				lengthPlayed.push("eighth");
+				if(eighthBar == "bar1"){
+					barOneCounter += 1;
+					//console.log("************************************barOneCounter:****************************************"+barOneCounter);
+				}
+				if(eighthBar == "bar2"){
+					barTwoCounter += barTwoCounter + 1;
+				}
 			}
+
 			if(quarterNotPlayed && marker.code()==2){
 				quarterNotPlayed = false;
 				var quarterNote = getNote(yLoc);
@@ -291,7 +302,20 @@ function markerSensorPlay(locationx, locationy, height, width){
 				playNote(quarterNote,"quarter");
 				notesPlayed.push(quarterNote);
 				lengthPlayed.push("quarter");
+
+				console.log("Adding image.........");
+				addNoteImage("quarterNote.png",xLoc,yLoc);
+
+				if(quarterBar == "bar1"){
+					barOneCounter += 2;
+					console.log("************************************barOneCounter:*************************************"+barOneCounter);
+					changeLightsBarOne(barOneCounter);
+				}
+				if(quarterBar == "bar2"){
+					barTwoCounter += 2;
+				}
 			}
+
 			if(halfNotPlayed && marker.code()==3){
 				halfNotPlayed = false;
 				var halfNote = getNote(yLoc);
@@ -300,6 +324,7 @@ function markerSensorPlay(locationx, locationy, height, width){
 				notesPlayed.push(halfNote);
 				lengthPlayed.push("half");
 			}
+
 			if(wholeNotPlayed && marker.code()==4){
 				wholeNotPlayed = false;
 				var wholeNote = getNote(yLoc);
@@ -308,42 +333,38 @@ function markerSensorPlay(locationx, locationy, height, width){
 				notesPlayed.push(wholeNote);
 				lengthPlayed.push("whole");
 			}
+
 			if(eightRestNotPlayed && marker.code()==5){
 				eightRestNotPlayed = false;
 				playRest("eighth");
+				var eighthRestBar = getBar(xLoc,yLoc);
 				notesPlayed.push("rest");
 				lengthPlayed.push("eighth");
 			}
+
 			if(quarterRestNotPlayed && marker.code()==6){
 				quarterRestNotPlayed = false;
 				playRest("quarter");
+				var quarterRestBar = getBar(xLoc,yLoc);
 				notesPlayed.push("rest");
 				lengthPlayed.push("quarter");
 			}
+
 			if(halfRestNotPlayed && marker.code()==7){
 				halfRestNotPlayed = false;
-				playRest("half");
+				playRest("half")
+				var halfRestBar = getBar(xLoc,yLoc);;
 				notesPlayed.push("rest");
 				lengthPlayed.push("half");
 			}
+
 			if(wholeRestNotPlayed && marker.code()==8){
 				wholeRestNotPlayed = false;
 				playRest("whole");
+				var wholeRestBar = getBar(xLoc,yLoc);
 				notesPlayed.push("rest");
 				lengthPlayed.push("whole");
 			}
-
-			console.log("..............................................NOTES PLAYED ARRAY............................................");
-			console.log(notesPlayed);
-		}
-	});
-
-	markerSensorStaff.onMarkerUp(function(id_as_string) {
-		var idAsInt = parseInt(id_as_string);
-		var gm = $.app.grabManager();
-		var marker = gm.findMarker(idAsInt);
-		if (marker.code()==1) {
-			console.log("****************** marker up *******************");
 		}
 	});
 
