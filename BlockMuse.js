@@ -20,16 +20,36 @@ var instructionList = ["i1.png", "i2.png", "i3.png", "i4.png", "i5.png", "i6.png
 
 //Add background Image
 var background = createBackground("images/staff.png");
-
-//root.addChild(playButton);
-
 root.addChild(background);
 
 var playButton = initializePlayButton("play.png");
+var resetButton = createResetButton("images/reset.png",570,835);
+
 createInstructions();
 initializeLights();
 
-console.log("************** Background ****************");
+//Adding all global variables
+var quarterNoteImg;
+var eighthNoteImg;
+var halfNoteImg;
+var wholeNoteImg;
+var eighthRestImg;
+var quarterRestImg;
+var halfRestImg;
+var wholeRestImg;
+var eighthNotPlayed = true;
+var quarterNotPlayed = true;
+var halfNotPlayed = true;
+var wholeNotPlayed = true;
+var eightRestNotPlayed = true;
+var quarterRestNotPlayed = true;
+var halfRestNotPlayed = true;
+var wholeRestNotPlayed = true;
+var notesPlayed = [];
+var lengthPlayed = [];
+var barOneCounter = 0;
+var barTwoCounter = 0;
+
 //root.addChild(playButton);
 //console.log("************** PlayButton ****************");
 
@@ -61,6 +81,70 @@ function createBackground (background) {
 	return w;
 }
 
+function createResetButton(image,x,y){
+	var w = new MultiWidgets.ImageWidget();
+
+	if (w.load(image)) {
+    	w.setLocation(x,y);
+    	w.setHeight(150);
+    	w.setWidth(150);
+	    root.addChild(w);
+    	w.raiseToTop();
+    	w.setFixed();
+	}
+
+	w.onSingleTap(function(){
+		console.log("In reset button on single tap");
+		if(null != quarterNoteImg){
+			quarterNoteImg.removeFromParent();
+		}
+
+		if(null != eighthNoteImg){
+			eighthNoteImg.removeFromParent();
+		}
+
+		if(null != halfNoteImg){
+			halfNoteImg.removeFromParent();
+		}
+
+		if(null != wholeNoteImg){	
+			wholeNoteImg.removeFromParent();
+		}
+
+		if(null != eighthRestImg){
+			eighthRestImg.removeFromParent();
+		}
+
+		if(null != quarterRestImg){
+			quarterRestImg.removeFromParent();
+		}
+
+		if(null != halfRestImg){
+			halfRestImg.removeFromParent();
+		}	
+		if(null != wholeRestImg){
+			wholeRestImg.removeFromParent();
+		}
+
+		initializeLights();
+		eighthNotPlayed = true;
+		quarterNotPlayed = true;
+		halfNotPlayed = true;
+		wholeNotPlayed = true;
+		eightRestNotPlayed = true;
+		quarterRestNotPlayed = true;
+		halfRestNotPlayed = true;
+		wholeRestNotPlayed = true;
+		notesPlayed = [];
+		lengthPlayed = [];
+		barOneCounter = 0;
+		barTwoCounter = 0;
+
+	});
+
+	return w;
+}
+
 //Create instructions as series of imagewidgets in itemflowwidget
 function createInstructions(){
 
@@ -80,7 +164,6 @@ function createInstructions(){
 		var imageWidget = new MultiWidgets.ImageWidget();
 		imageWidget.load("images/"+instructionList[i]);
 		console.log("loaded image");
-
 		flow.addItem(imageWidget);
 	}
 
@@ -90,16 +173,39 @@ function createInstructions(){
 }
 
 //function to change the color of lights when a note is placed
-//dependent on marker sensor of note (what LENGTH and what POSITION)
 function changeLightsBarOne(){
 	var x = root.width()*0.255;
-	//given number of beats, light up number amount of lights and add beats to counter.
-	//if number exceeds available (max 8) then turn all to red. 
-
-	for(i=0; i<barOneCounter; i++){
+	if(barOneCounter > 8) {
+		for(i=0; i<=7; i++){
 		console.log("PLACEMENT: "+i);
-		addImage("gLED.png", x, root.height()*.65);
+		addImage("rLED.png", x, root.height()*.65);
 		x += root.width()*.041;
+		}
+	}
+	else{	
+		for(i=0; i<barOneCounter; i++){
+			console.log("PLACEMENT: "+i);
+			addImage("gLED.png", x, root.height()*.65);
+			x += root.width()*.041;
+		}
+	}	
+}
+
+function changeLightsBarTwo(){
+	var x = root.width()*0.583;
+	if(barTwoCounter > 8) {
+		for(i=0; i<=7; i++){
+		console.log("PLACEMENT: "+i);
+		addImage("rLED.png", x, root.height()*.65);
+		x += root.width()*.041;
+		}
+	}
+	else{	
+		for(i=0; i<barTwoCounter; i++){
+			console.log("PLACEMENT: "+i);
+			addImage("gLED.png", x, root.height()*.65);
+			x += root.width()*.041;
+		}
 	}
 }
 
@@ -240,19 +346,6 @@ function markerSensorPlay(locationx, locationy, height, width){
 	// 8 whole rest brick
 	// 9 play water water
 
-	var eighthNotPlayed = true;
-	var quarterNotPlayed = true;
-	var halfNotPlayed = true;
-	var wholeNotPlayed = true;
-	var eightRestNotPlayed = true;
-	var quarterRestNotPlayed = true;
-	var halfRestNotPlayed = true;
-	var wholeRestNotPlayed = true;
-	var notesPlayed = [];
-	var lengthPlayed = [];
-	var barOneCounter = 0;
-	var barTwoCounter = 0;
-
 	function markerSensorStaff(locationx, locationy, height, width){
 	console.log("Placing staff marker sensor...");
 	var markerSensorStaff = new MultiWidgets.JavaScriptWidget();
@@ -286,12 +379,16 @@ function markerSensorPlay(locationx, locationy, height, width){
 				playNote(eighthNote,"eighth");
 				notesPlayed.push(eighthNote);
 				lengthPlayed.push("eighth");
+
+				eighthNoteImg = addNoteImage("eighthNote.png",xLoc,yLoc);
+
 				if(eighthBar == "bar1"){
 					barOneCounter += 1;
-					//console.log("************************************barOneCounter:****************************************"+barOneCounter);
+					changeLightsBarOne(barOneCounter);
 				}
 				if(eighthBar == "bar2"){
 					barTwoCounter += barTwoCounter + 1;
+					changeLightsBarTwo(barTwoCounter);
 				}
 			}
 
@@ -303,16 +400,16 @@ function markerSensorPlay(locationx, locationy, height, width){
 				notesPlayed.push(quarterNote);
 				lengthPlayed.push("quarter");
 
-				console.log("Adding image.........");
-				addNoteImage("quarterNote.png",xLoc,yLoc);
+				quarterNoteImg = addNoteImage("quarterNote.png",xLoc,yLoc);
 
 				if(quarterBar == "bar1"){
 					barOneCounter += 2;
-					console.log("************************************barOneCounter:*************************************"+barOneCounter);
 					changeLightsBarOne(barOneCounter);
 				}
+
 				if(quarterBar == "bar2"){
 					barTwoCounter += 2;
+					changeLightsBarTwo(barTwoCounter);
 				}
 			}
 
@@ -323,6 +420,17 @@ function markerSensorPlay(locationx, locationy, height, width){
 				playNote(halfNote,"half");
 				notesPlayed.push(halfNote);
 				lengthPlayed.push("half");
+
+				halfNoteImg = addNoteImage("halfNote.png",xLoc,yLoc);
+
+				if(halfBar == "bar1"){
+					barOneCounter += 4;
+					changeLightsBarOne(barOneCounter);
+				}
+				if(halfBar == "bar2"){
+					barTwoCounter += 4;
+					changeLightsBarTwo(barTwoCounter);
+				}
 			}
 
 			if(wholeNotPlayed && marker.code()==4){
@@ -332,6 +440,17 @@ function markerSensorPlay(locationx, locationy, height, width){
 				playNote(wholeNote,"whole");
 				notesPlayed.push(wholeNote);
 				lengthPlayed.push("whole");
+
+				wholeNoteImg = addNoteImage("wholeNote.png",xLoc,yLoc);
+
+				if(wholeBar == "bar1"){
+					barOneCounter += 8;
+					changeLightsBarOne(barOneCounter);
+				}
+				if(wholeBar == "bar2"){
+					barTwoCounter += 8;
+					changeLightsBarTwo(barTwoCounter);
+				}
 			}
 
 			if(eightRestNotPlayed && marker.code()==5){
@@ -340,6 +459,17 @@ function markerSensorPlay(locationx, locationy, height, width){
 				var eighthRestBar = getBar(xLoc,yLoc);
 				notesPlayed.push("rest");
 				lengthPlayed.push("eighth");
+
+				eighthRestImg = addNoteImage("eighthRest.png",xLoc,yLoc);
+
+				if(eighthRestBar == "bar1"){
+					barOneCounter += 1;
+					changeLightsBarOne(barOneCounter);
+				}
+				if(eighthRestBar == "bar2"){
+					barTwoCounter += barTwoCounter + 1;
+					changeLightsBarTwo(barTwoCounter);
+				}
 			}
 
 			if(quarterRestNotPlayed && marker.code()==6){
@@ -348,6 +478,17 @@ function markerSensorPlay(locationx, locationy, height, width){
 				var quarterRestBar = getBar(xLoc,yLoc);
 				notesPlayed.push("rest");
 				lengthPlayed.push("quarter");
+
+				quarterRestImg = addNoteImage("quarterRest.png",xLoc,yLoc);
+
+				if(quarterRestBar == "bar1"){
+					barOneCounter += 2;
+					changeLightsBarOne(barOneCounter);
+				}
+				if(quarterRestBar == "bar2"){
+					barTwoCounter += barTwoCounter + 2;
+					changeLightsBarTwo(barTwoCounter);
+				}
 			}
 
 			if(halfRestNotPlayed && marker.code()==7){
@@ -356,6 +497,17 @@ function markerSensorPlay(locationx, locationy, height, width){
 				var halfRestBar = getBar(xLoc,yLoc);;
 				notesPlayed.push("rest");
 				lengthPlayed.push("half");
+
+				halfRestImg = addNoteImage("halfRest.png",xLoc,yLoc);
+
+				if(halfRestBar == "bar1"){
+					barOneCounter += 4;
+					changeLightsBarOne(barOneCounter);
+				}
+				if(halfRestBar == "bar2"){
+					barTwoCounter += 4;
+					changeLightsBarTwo(barTwoCounter);
+				}
 			}
 
 			if(wholeRestNotPlayed && marker.code()==8){
@@ -364,6 +516,17 @@ function markerSensorPlay(locationx, locationy, height, width){
 				var wholeRestBar = getBar(xLoc,yLoc);
 				notesPlayed.push("rest");
 				lengthPlayed.push("whole");
+
+				wholeRestImg = addNoteImage("wholeRest.png",xLoc,yLoc);
+
+				if(wholeRestBar == "bar1"){
+					barOneCounter += 8;
+					changeLightsBarOne(barOneCounter);
+				}
+				if(wholeRestBar == "bar2"){
+					barTwoCounter += barTwoCounter + 8;
+					changeLightsBarTwo(barTwoCounter);
+				}
 			}
 		}
 	});
