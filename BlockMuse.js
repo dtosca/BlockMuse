@@ -1,8 +1,9 @@
 /*
 * BlockMuse™ file for Cornerstone SDK Multitaction Screen
-* Written by Kaylie Cox, Diana Tosca, and Ingrid Henderson
+* Wellesley College CS 320
+* Team Members: Kaylie Cox, Diana Tosca, and Ingrid Henderson
 * Created 11/5/2017
-* Modified 11/15/2017
+* Modified 12/11/2017
 */
 
 //Set up root
