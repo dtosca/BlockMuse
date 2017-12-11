@@ -18,6 +18,9 @@ var lit = false;
 //set up list of instruction images
 var instructionList = ["i1.png", "i2.png", "i3.png", "i4.png", "i5.png", "i6.png"];
 
+//adding blockMuse title
+addTitle(300,0);
+
 //Add background Image
 var background = createBackground("images/staff.png");
 root.addChild(background);
@@ -315,6 +318,22 @@ function addImage(image, x, y){
 	if (w.load("images/"+image)) {
     	w.setHeight(35);
     	w.setWidth(35);
+    	w.setLocation(x,y);
+	    root.addChild(w);
+    	w.raiseToTop();
+    	w.setFixed();
+	}
+
+	return w;
+}
+
+function addTitle(x, y){
+	var w = new MultiWidgets.ImageWidget();
+
+	//raise images to top, set height and width, set fixed
+	if (w.load("images/blockMuse.png")) {
+    	w.setHeight(225);
+    	w.setWidth(1413);
     	w.setLocation(x,y);
 	    root.addChild(w);
     	w.raiseToTop();
