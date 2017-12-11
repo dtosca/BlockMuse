@@ -31,7 +31,6 @@ createInstructions();
 initializeLights();
 
 //Adding all global variables
-
 //variables for initializing note img
 var quarterNoteImg;
 var eighthNoteImg;
@@ -144,6 +143,9 @@ function createResetButton(image,x,y){
 		//reinitalize lights to make them unlit
 		initializeLights();
 
+		//initialize play button to turn the light off
+		initializePlayButton("play.png");
+
 		//reset all the variables
 		eighthNotPlayed = true;
 		quarterNotPlayed = true;
@@ -154,11 +156,11 @@ function createResetButton(image,x,y){
 		halfRestNotPlayed = true;
 		wholeRestNotPlayed = true;
 		playNotPressed = true;
+		lit = false;
 		notesPlayed = [];
 		lengthPlayed = [];
 		barOneCounter = 0;
 		barTwoCounter = 0;
-
 	});
 
 	return w;
@@ -221,17 +223,17 @@ function changeLightsBarOne(){
 //function to change the color of lights in the second bar when a note is placed
 function changeLightsBarTwo(){
 	//placement of the first light
-	var x = root.width()*0.255;
+	var x = root.width()*0.583;
 
 	//if the barTwoCounter global variable counts too many beats per bar, turn all the lights red
-	if(barOneCounter > 8) {
+	if(barTwoCounter > 8) {
 		for(i=0; i<=7; i++){
 		addImage("rLED.png", x, root.height()*.65);
 		x += root.width()*.041;
 		}
 	}
 	//if the barTwoCounter has the correct amount of beats, turn all the lights green
-	else if (barOneCounter == 8){
+	else if (barTwoCounter == 8){
 		for(i=0; i<=7; i++){
 		addImage("gLED.png", x, root.height()*.65);
 		x += root.width()*.041;
@@ -239,7 +241,7 @@ function changeLightsBarTwo(){
 	}
 	//if the barTwoCounter doesn't have enough beats, lights with filled beats turns yellow
 	else{	
-		for(i=0; i<barOneCounter; i++){
+		for(i=0; i<barTwoCounter; i++){
 			addImage("yLED.png", x, root.height()*.65);
 			x += root.width()*.041;
 		}
@@ -277,7 +279,7 @@ function initializePlayButton(image){
 	    w.setHeight(height);
 	    w.setLocation(LocX,LocY);
     	root.addChild(w);
-    	//w.raiseToTop();
+    	w.raiseToTop();
     	w.setFixed();
 	}
 
@@ -286,6 +288,12 @@ function initializePlayButton(image){
 		w.onSingleTap(function(){
 			lit = true;
 			w.setSource("images/gPlay.png");
+			console.log("Tapping the play button");
+			for(note in notesPlayed){
+				for(length in lengthPlayed){
+					soundPlayButton(notesPlayed[note],lengthPlayed[length]);
+				}
+			}
 		});
 			
 	}
@@ -293,7 +301,7 @@ function initializePlayButton(image){
 			w.onSingleTap(function(){
 				console.log("unlight");
 				w.setSource("images/play.png")});
-			lit = false;
+				lit = false;
 		}
 
 	return w;
@@ -359,7 +367,8 @@ function markerSensorPlay(locationx, locationy, height, width){
 	markerSensorPlay.setHeight(height);
 	markerSensorPlay.setWidth(width);
 	markerSensorPlay.setFixed();
-	markerSensorPlay.setBackgroundColor(1.0,1.0,.53,1.0);
+	//give Marker Sensor a color to know where it is
+	//markerSensorPlay.setBackgroundColor(1.0,1.0,.53,1.0);
 
 	markerSensorPlay.onMarkerDown(function(id_as_string) {
 		var idAsInt = parseInt(id_as_string);
@@ -367,11 +376,17 @@ function markerSensorPlay(locationx, locationy, height, width){
 		var marker = gm.findMarker(idAsInt);
 
 		//checking if its the correct marker code and the flag hasn't been set off
-		if(marker.code()==9 && playNotPressed){
-			console.log("**************** marker down: x: "+ marker.centerLocation().x+" y: "+marker.centerLocation().y+" *****************");
+		if(marker.code()==10 && playNotPressed){
+			console.log("*********************************In Play Sound Button***********************************");
+			console.log("marker down: x: "+ marker.centerLocation().x+" y: "+marker.centerLocation().y+" *****************");
 			playNotPressed = false;
 			console.log(notesPlayed);
 			console.log(lengthPlayed);
+			for(note in notesPlayed){
+				for(length in lengthPlayed){
+					setTimeout(soundPlayButton(notesPlayed[note],lengthPlayed[length]),3000);
+				}
+			}
 		}
 	});
 
@@ -381,13 +396,135 @@ function markerSensorPlay(locationx, locationy, height, width){
 		var idAsInt = parseInt(id_as_string);
 		var gm = $.app.grabManager();
 		var marker = gm.findMarker(idAsInt);
-		if (marker.code()==9) {
+		if (marker.code()==10) {
 			console.log("****************** marker up *******************");
 		}
 	});
 
 	root.addChild(markerSensorPlay);
-	markerSensorPlay.raiseToTop();
+		markerSensorPlay.raiseToTop();
+	}
+
+	//sound for play button, if statements differentiate between type of note
+	function soundPlayButton(note,length){
+		console.log(note);
+		console.log(length);
+
+		//eigth note sounds
+		if(note=="E4" && length=="eighth"){
+			audioPlay("Notes/8thE4.wav");
+		}
+		if(note=="F4" && length=="eighth"){
+			audioPlay("Notes/8thF4.wav");
+		}
+		if(note=="G4" && length=="eighth"){
+			audioPlay("Notes/8thG4.wav");
+		}
+		if(note=="A4" && length=="eighth"){
+			audioPlay("Notes/8thA4.wav");
+		}
+		if(note=="B4" && length=="eighth"){
+			audioPlay("Notes/8thB4.wav");
+		}
+		if(note=="C5" && length=="eighth"){
+			audioPlay("Notes/8thC5.wav");
+		}
+		if(note=="D5" && length=="eighth"){
+			audioPlay("Notes/8thD5.wav");
+		}
+		if(note=="E5" && length=="eighth"){
+			audioPlay("Notes/8thE5.wav");
+		}
+		if(note=="F5" && length=="eighth"){
+			audioPlay("Notes/8thF5.wav");
+		}
+
+		//quarter note sounds
+		if(note=="E4" && length=="quarter"){
+			audioPlay("Notes/A4.wav");
+		}
+		if(note=="F4" && length=="quarter"){
+			audioPlay("Notes/F4.wav");
+		}
+		if(note=="G4" && length=="quarter"){
+			audioPlay("Notes/G4.wav");
+		}
+		if(note=="A4" && length=="quarter"){
+			audioPlay("Notes/A4.wav");
+		}
+		if(note=="B4" && length=="quarter"){
+			audioPlay("Notes/B4.wav");
+		}
+		if(note=="C5" && length=="quarter"){
+			audioPlay("Notes/C5.wav");
+		}
+		if(note=="D5" && length=="quarter"){
+			audioPlay("Notes/D5.wav");
+		}
+		if(note=="E5" && length=="quarter"){
+			audioPlay("Notes/E5.wav");
+		}
+		if(note=="F5" && length=="quarter"){
+			audioPlay("Notes/F5.wav");
+		}
+
+		//half note sounds
+		if(note=="E4" && length=="half"){
+			audioPlay("Notes/halfE4.wav");
+		}
+		if(note=="F4" && length=="half"){
+			audioPlay("Notes/halfF4.wav");
+		}
+		if(note=="G4" && length=="half"){
+			audioPlay("Notes/halfG4.wav");
+		}
+		if(note=="A4" && length=="half"){
+			audioPlay("Notes/halfA4.wav");
+		}
+		if(note=="B4" && length=="half"){
+			audioPlay("Notes/halfB4.wav");
+		}
+		if(note=="C5" && length=="half"){
+			audioPlay("Notes/halfC5.wav");
+		}
+		if(note=="D5" && length=="half"){
+			audioPlay("Notes/halfD5.wav");
+		}
+		if(note=="E5" && length=="half"){
+			audioPlay("Notes/halfE5.wav");
+		}
+		if(note=="F5" && length=="half"){
+			audioPlay("Notes/halfF5.wav");
+		}
+
+		//whole note sounds
+		if(note=="E4" && length=="whole"){
+			audioPlay("Notes/fullE4.wav");
+		}
+		if(note=="F4" && length=="whole"){
+			audioPlay("Notes/fullF4.wav");
+		}
+		if(note=="G4" && length=="whole"){
+			audioPlay("Notes/fullG4.wav");
+		}
+		if(note=="A4" && length=="whole"){
+			audioPlay("Notes/fullA4.wav");
+		}
+		if(note=="B4" && length=="whole"){
+			audioPlay("Notes/fullB4.wav");
+		}
+		if(note=="C5" && length=="whole"){
+			audioPlay("Notes/fullC5.wav");
+		}
+		if(note=="D5" && length=="whole"){
+			audioPlay("Notes/fullD5.wav");
+		}
+		if(note=="E5" && length=="whole"){
+			audioPlay("Notes/fullE5.wav");
+		}
+		if(note=="F5" && length=="whole"){
+			audioPlay("Notes/fullF5.wav");
+		}
 	}
 
 	//note mappings for maker codes:
@@ -414,8 +551,6 @@ function markerSensorPlay(locationx, locationy, height, width){
 
 	//when the marker sensors are placed
 	markerSensorStaff.onMarkerDown(function(id_as_string) {
-		console.log("************************BAR COUNTER*****************************");
-		console.log(barOneCounter);
 		var idAsInt = parseInt(id_as_string);
 		var gm = $.app.grabManager();
 		var marker = gm.findMarker(idAsInt);
@@ -436,233 +571,288 @@ function markerSensorPlay(locationx, locationy, height, width){
 
 			//if a note if played and it is the coreect marker code
 			if(eighthNotPlayed && marker.code()==1){
-				//set the flag for the maker being placed
-				eighthNotPlayed = false;
-
 				//get which note and bar it is placed on
 				var eighthNote = getNote(yLoc);
 				var eighthBar = getBar(xLoc,yLoc);
 
-				//play the note sound
-				playNote(eighthNote,"eighth");
-
-				//push the note and length onto the arrays
-				notesPlayed.push(eighthNote);
-				lengthPlayed.push("eighth");
-
-				//place image of the note
-				eighthNoteImg = addNoteImage("eighthNote.png",xLoc,yLoc);
-
-				//change lights in the counter
-				if(eighthBar == "bar1"){
-					barOneCounter += 1;
-					changeLightsBarOne(barOneCounter);
+				if (eighthNote=="Error") {
+					audioPlay("Notes/beep.wav");
 				}
-				if(eighthBar == "bar2"){
-					barTwoCounter += barTwoCounter + 1;
-					changeLightsBarTwo(barTwoCounter);
+				else if(eighthBar=="bar1" && barOneCounter+1 >8){
+					audioPlay("Notes/beep.wav");
+				}
+				else if(eighthBar=="bar2" && barTwoCounter+1 >8){
+					audioPlay("Notes/beep.wav");
+				}
+				else{
+					//set the flag for the maker being placed
+					eighthNotPlayed = false;
+					//play the note sound
+					playNote(eighthNote,"eighth");
+					//place image of the note
+					eighthNoteImg = addNoteImage("eighthNote.png",xLoc,yLoc);
+					//push the note and length onto the arrays
+					notesPlayed.push(eighthNote);
+					lengthPlayed.push("eighth");
+
+					//change lights in the counter
+					if(eighthBar == "bar1"){
+						barOneCounter += 1;
+						changeLightsBarOne(barOneCounter);
+					}
+					if(eighthBar == "bar2"){
+						barTwoCounter += 1;
+						changeLightsBarTwo(barTwoCounter);
+					}
 				}
 			}
 
 			if(quarterNotPlayed && marker.code()==3){
-				//set the flag for the maker being placed
-				quarterNotPlayed = false;
-
 				//get which note and bar it is placed on
 				var quarterNote = getNote(yLoc);
 				var quarterBar = getBar(xLoc,yLoc);
 
-				//play the note sound
-				playNote(quarterNote,"quarter");
-
-				//push the note and length onto the arrays
-				notesPlayed.push(quarterNote);
-				lengthPlayed.push("quarter");
-
-				//place image of the note
-				quarterNoteImg = addNoteImage("quarterNote.png",xLoc,yLoc);
-
-				//change lights in the counter
-				if(quarterBar == "bar1"){
-					barOneCounter += 2;
-					changeLightsBarOne(barOneCounter);
+				if (quarterNote=="Error") {
+					audioPlay("Notes/beep.wav");
 				}
+				else if(quarterBar=="bar1" && barOneCounter+2 >8){
+					audioPlay("Notes/beep.wav");
+				}
+				else if(quarterBar=="bar2" && barTwoCounter+2 >8){
+					audioPlay("Notes/beep.wav");
+				}
+				else{
+					//set the flag for the maker being placed
+					quarterNotPlayed = false;
+					//play the note sound
+					playNote(quarterNote,"quarter");
+					//place image of the note
+					quarterNoteImg = addNoteImage("quarterNote.png",xLoc,yLoc);
+					//push the note and length onto the arrays
+					notesPlayed.push(quarterNote);
+					lengthPlayed.push("quarter");
 
-				if(quarterBar == "bar2"){
-					barTwoCounter += 2;
-					changeLightsBarTwo(barTwoCounter);
+					//change lights in the counter
+					if(quarterBar == "bar1"){
+						barOneCounter += 2;
+						changeLightsBarOne(barOneCounter);
+					}
+
+					if(quarterBar == "bar2"){
+						barTwoCounter += 2;
+						changeLightsBarTwo(barTwoCounter);
+					}
 				}
 			}
 
 			if(halfNotPlayed && marker.code()==5){
-				//set the flag for the maker being placed
-				halfNotPlayed = false;
-
 				//get which note and bar it is placed on
 				var halfNote = getNote(yLoc);
 				var halfBar = getBar(xLoc,yLoc);
 
-				//play the note sound
-				playNote(halfNote,"half");
-
-				//push the note and length onto the arrays
-				notesPlayed.push(halfNote);
-				lengthPlayed.push("half");
-
-				//place image of the note
-				halfNoteImg = addNoteImage("halfNote.png",xLoc,yLoc);
-
-				//change lights in the counter
-				if(halfBar == "bar1"){
-					barOneCounter += 4;
-					changeLightsBarOne(barOneCounter);
+				if (halfNote=="Error") {
+					audioPlay("Notes/beep.wav");
 				}
-				if(halfBar == "bar2"){
-					barTwoCounter += 4;
-					changeLightsBarTwo(barTwoCounter);
+				else if(halfBar=="bar1" && barOneCounter+4 >8){
+					audioPlay("Notes/beep.wav");
+				}
+				else if(halfBar=="bar2" && barTwoCounter+4 >8){
+					audioPlay("Notes/beep.wav");
+				}
+				else{
+					//set the flag for the maker being placed
+					halfNotPlayed = false;
+					//play the note sound
+					playNote(halfNote,"half");
+					//place image of the note
+					halfNoteImg = addNoteImage("halfNote.png",xLoc,yLoc);
+									//push the note and length onto the arrays
+					notesPlayed.push(halfNote);
+					lengthPlayed.push("half");
+
+					//change lights in the counter
+					if(halfBar == "bar1"){
+						barOneCounter += 4;
+						changeLightsBarOne(barOneCounter);
+					}
+					if(halfBar == "bar2"){
+						barTwoCounter += 4;
+						changeLightsBarTwo(barTwoCounter);
+					}
 				}
 			}
 
 			if(wholeNotPlayed && marker.code()==2){
-				//set the flag for the maker being placed
-				wholeNotPlayed = false;
-
 				//get which note and bar it is placed on
 				var wholeNote = getNote(yLoc);
 				var wholeBar = getBar(xLoc,yLoc);
 
-				//play the note sound
-				playNote(wholeNote,"whole");
-
-				//push the note and length onto the arrays
-				notesPlayed.push(wholeNote);
-				lengthPlayed.push("whole");
-
-				//place image of the note
-				wholeNoteImg = addNoteImage("wholeNote.png",xLoc,yLoc);
-
-				//change lights in the counter
-				if(wholeBar == "bar1"){
-					barOneCounter += 8;
-					changeLightsBarOne(barOneCounter);
+				if (wholeNote=="Error") {
+					audioPlay("Notes/beep.wav");
 				}
-				if(wholeBar == "bar2"){
-					barTwoCounter += 8;
-					changeLightsBarTwo(barTwoCounter);
+				else if(wholeBar=="bar1" && barOneCounter+8 >8){
+					audioPlay("Notes/beep.wav");
+				}
+				else if(wholeBar=="bar2" &&barTwoCounter+8 >8){
+					audioPlay("Notes/beep.wav");
+				}
+				else{
+					//set the flag for the maker being placed
+					wholeNotPlayed = false;
+					//play the note sound
+					playNote(wholeNote,"whole");
+					//place image of the note
+					wholeNoteImg = addNoteImage("wholeNote.png",xLoc,yLoc);
+					//push the note and length onto the arrays
+					notesPlayed.push(wholeNote);
+					lengthPlayed.push("whole");
+
+					//change lights in the counter
+					if(wholeBar == "bar1"){
+						barOneCounter += 8;
+						changeLightsBarOne(barOneCounter);
+					}
+					if(wholeBar == "bar2"){
+						barTwoCounter += 8;
+						changeLightsBarTwo(barTwoCounter);
+					}
 				}
 			}
 
 			if(eightRestNotPlayed && marker.code()==4){
-				//set the flag for the maker being placed
-				eightRestNotPlayed = false;
-
-				//play rest sound
-				playRest("eighth");
-
 				//get bar rest is placed on 
 				var eighthRestBar = getBar(xLoc,yLoc);
 
-				//push rest and length onto the arrays
-				notesPlayed.push("rest");
-				lengthPlayed.push("eighth");
-
-				//place image of the note
-				eighthRestImg = addRestImage("eighthRest.png",xLoc,yLoc);
-
-				//change lights in the counter
-				if(eighthRestBar == "bar1"){
-					barOneCounter += 1;
-					changeLightsBarOne(barOneCounter);
+				if(eighthRestBar=="bar1" && barOneCounter+1 >8){
+					audioPlay("Notes/beep.wav");
 				}
-				if(eighthRestBar == "bar2"){
-					barTwoCounter += barTwoCounter + 1;
-					changeLightsBarTwo(barTwoCounter);
+				else if(eighthRestBar=="bar2" && barTwoCounter+1 >8){
+					audioPlay("Notes/beep.wav");
+				}
+				else{
+					//set the flag for the maker being placed
+					eightRestNotPlayed = false;
+					//play rest sound
+					playRest("eighth");
+					//place image of the note
+					eighthRestImg = addRestImage("eighthRest.png",xLoc,yLoc);
+					//push rest and length onto the arrays
+					notesPlayed.push("rest");
+					lengthPlayed.push("eighth");
+
+					//change lights in the counter
+					if(eighthRestBar == "bar1"){
+						barOneCounter += 1;
+						changeLightsBarOne(barOneCounter);
+					}
+					if(eighthRestBar == "bar2"){
+						barTwoCounter += 1;
+						changeLightsBarTwo(barTwoCounter);
+					}
 				}
 			}
 
 			if(quarterRestNotPlayed && marker.code()==6){
-				//set the flag for the maker being placed
-				quarterRestNotPlayed = false;
-
-				//play rest sound
-				playRest("quarter");
-
 				//get bar rest is placed on 
 				var quarterRestBar = getBar(xLoc,yLoc);
 
-				//push rest and length onto the arrays
-				notesPlayed.push("rest");
-				lengthPlayed.push("quarter");
-
-				//place image of the note
-				quarterRestImg = addRestImage("quarterRest.png",xLoc,yLoc);
-
-				//change lights in the counter
-				if(quarterRestBar == "bar1"){
-					barOneCounter += 2;
-					changeLightsBarOne(barOneCounter);
+				if(quarterRestBar=="bar1" && barOneCounter+2 >8){
+					audioPlay("Notes/beep.wav");
 				}
-				if(quarterRestBar == "bar2"){
-					barTwoCounter += barTwoCounter + 2;
-					changeLightsBarTwo(barTwoCounter);
+				else if(quarterRestBar=="bar2" && barTwoCounter+2 >8){
+					audioPlay("Notes/beep.wav");
+				}
+				else{
+					//set the flag for the maker being placed
+					quarterRestNotPlayed = false;
+					//play rest sound
+					playRest("quarter");
+					//place image of the note
+					quarterRestImg = addRestImage("quarterRest.png",xLoc,yLoc);
+					//push rest and length onto the arrays
+					notesPlayed.push("rest");
+					lengthPlayed.push("quarter");
+
+					//change lights in the counter
+					if(quarterRestBar == "bar1"){
+						barOneCounter += 2;
+						changeLightsBarOne(barOneCounter);
+					}
+					if(quarterRestBar == "bar2"){
+						barTwoCounter += 2;
+						changeLightsBarTwo(barTwoCounter);
+					}
 				}
 			}
 
 			if(halfRestNotPlayed && marker.code()==7){
-				//set the flag for the maker being placed
-				halfRestNotPlayed = false;
-
-				//play rest sound
-				playRest("half")
-
 				//get bar rest is placed on 
 				var halfRestBar = getBar(xLoc,yLoc);
 
-				//push rest and length onto the arrays
-				notesPlayed.push("rest");
-				lengthPlayed.push("half");
-
-				//place image of the note
-				halfRestImg = addRestImage("halfRest.png",xLoc,yLoc);
-
-				//change lights in the counter
-				if(halfRestBar == "bar1"){
-					barOneCounter += 4;
-					changeLightsBarOne(barOneCounter);
+				if(halfRestBar=="bar1" && barOneCounter+4 >8){
+					audioPlay("Notes/beep.wav");
 				}
-				if(halfRestBar == "bar2"){
-					barTwoCounter += 4;
-					changeLightsBarTwo(barTwoCounter);
+				else if(halfRestBar=="bar2" && barTwoCounter+4 >8){
+					audioPlay("Notes/beep.wav");
+				}
+				else{
+					//set the flag for the maker being placed
+					halfRestNotPlayed = false;
+					//play rest sound
+					playRest("half");
+					//place image of the note
+					halfRestImg = addRestImage("halfRest.png",xLoc,yLoc);
+					//push rest and length onto the arrays
+					notesPlayed.push("rest");
+					lengthPlayed.push("half");
+
+					//change lights in the counter
+					if(halfRestBar == "bar1"){
+						barOneCounter += 4;
+						changeLightsBarOne(barOneCounter);
+					}
+					if(halfRestBar == "bar2"){
+						barTwoCounter += 4;
+						changeLightsBarTwo(barTwoCounter);
+					}
 				}
 			}
 
 			if(wholeRestNotPlayed && marker.code()==8){
-				//set the flag for the maker being placed
-				wholeRestNotPlayed = false;
-
-				//play rest sound
-				playRest("whole");
-				
 				//get bar rest is placed on 
 				var wholeRestBar = getBar(xLoc,yLoc);
-				
-				//push rest and length onto the arrays
-				notesPlayed.push("rest");
-				lengthPlayed.push("whole");
 
-				//place image of the note
-				wholeRestImg = addRestImage("wholeRest.png",xLoc,yLoc);
-
-				//change lights in the counter
-				if(wholeRestBar == "bar1"){
-					barOneCounter += 8;
-					changeLightsBarOne(barOneCounter);
+				if(wholeRestBar=="bar1" && barOneCounter+8 >8){
+					audioPlay("Notes/beep.wav");
 				}
-				if(wholeRestBar == "bar2"){
-					barTwoCounter += barTwoCounter + 8;
-					changeLightsBarTwo(barTwoCounter);
+				else if(wholeRestBar=="bar2" && barTwoCounter+8 >8){
+					audioPlay("Notes/beep.wav");
+				}
+				else{
+					//set the flag for the maker being placed
+					wholeRestNotPlayed = false;
+					//play rest sound
+					playRest("whole");
+					//place image of the note
+					wholeRestImg = addRestImage("wholeRest.png",xLoc,yLoc);
+					//push rest and length onto the arrays
+					notesPlayed.push("rest");
+					lengthPlayed.push("whole");
+
+					//change lights in the counter
+					if(wholeRestBar == "bar1"){
+						barOneCounter += 8;
+						changeLightsBarOne(barOneCounter);
+					}
+					if(wholeRestBar == "bar2"){
+						barTwoCounter += 8;
+						changeLightsBarTwo(barTwoCounter);
+					}
 				}
 			}
+			console.log("************************BarCounters******************");
+			console.log(barOneCounter);
+			console.log(barTwoCounter);
 		}
 	});
 
@@ -857,7 +1047,7 @@ function markerSensorPlay(locationx, locationy, height, width){
 		}
 		else {
 			console.log("Note out of range");
-			audioPlay("Media/beep.wav");
+			audioPlay("Note/beep.wav");
 			return "Error";
 		}
 
@@ -866,8 +1056,8 @@ function markerSensorPlay(locationx, locationy, height, width){
 	function getBar(xLoc){
 		//bar lengths
 		var barStart = 500; //start of bar 1
-		var bar1 = 1000; //end of bar 1
-		var bar2 = 1500; //end of bar 2
+		var bar1 = 1100; //end of bar 1
+		var bar2 = 1800; //end of bar 2
 
 		if (xLoc > barStart && xLoc < bar1)
 		{
