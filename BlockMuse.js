@@ -22,13 +22,17 @@ var instructionList = ["i1.png", "i2.png", "i3.png", "i4.png", "i5.png", "i6.png
 var background = createBackground("images/staff.png");
 root.addChild(background);
 
+//Creating play button and reset button
 var playButton = initializePlayButton("play.png");
 var resetButton = createResetButton("images/reset.png",570,835);
 
+//Creating instructions and the light images
 createInstructions();
 initializeLights();
 
 //Adding all global variables
+
+//variables for initializing note img
 var quarterNoteImg;
 var eighthNoteImg;
 var halfNoteImg;
@@ -37,6 +41,8 @@ var eighthRestImg;
 var quarterRestImg;
 var halfRestImg;
 var wholeRestImg;
+
+//flags for detecting if note or play button marker senssor has been placed
 var eighthNotPlayed = true;
 var quarterNotPlayed = true;
 var halfNotPlayed = true;
@@ -45,16 +51,17 @@ var eightRestNotPlayed = true;
 var quarterRestNotPlayed = true;
 var halfRestNotPlayed = true;
 var wholeRestNotPlayed = true;
+var playNotPressed = true;
+
+//arrays for detecting which notes/lengths have been played
 var notesPlayed = [];
 var lengthPlayed = [];
+
+//counter for beats in each bar
 var barOneCounter = 0;
 var barTwoCounter = 0;
 
-//root.addChild(playButton);
-//console.log("************** PlayButton ****************");
-
-//Creates and returns a customized widget for the application background
-//that contains an ImageWidget.
+//Creates and returns a customized widget for the application background that contains an ImageWidget.
 function createBackground (background) {
 	var w = new MultiWidgets.JavaScriptWidget();
 
@@ -64,6 +71,7 @@ function createBackground (background) {
 	w.setFixed();
 	w.setAutoRaiseToTop(false);
 
+	//create image widget for the background
 	w.image = new MultiWidgets.ImageWidget();
 
 	//load background image in and format
@@ -77,13 +85,18 @@ function createBackground (background) {
     	w.image.raiseToTop();
 	}
 
+	//placing the marker sensor for the staff with the same height and width as the staff
 	markerSensorStaff(root.width()*0.075,root.height()*.25,root.height()*.5,root.width()*.85);
+
+	//return the widget
 	return w;
 }
 
+//creating the reset button
 function createResetButton(image,x,y){
 	var w = new MultiWidgets.ImageWidget();
 
+	//loading reset button image and making it the correct size
 	if (w.load(image)) {
     	w.setLocation(x,y);
     	w.setHeight(150);
@@ -93,8 +106,10 @@ function createResetButton(image,x,y){
     	w.setFixed();
 	}
 
+	//reset of each variable occurs when the reset button is pressed
 	w.onSingleTap(function(){
-		console.log("In reset button on single tap");
+
+		//check if note image isn't null, then remove them
 		if(null != quarterNoteImg){
 			quarterNoteImg.removeFromParent();
 		}
@@ -126,7 +141,10 @@ function createResetButton(image,x,y){
 			wholeRestImg.removeFromParent();
 		}
 
+		//reinitalize lights to make them unlit
 		initializeLights();
+
+		//reset all the variables
 		eighthNotPlayed = true;
 		quarterNotPlayed = true;
 		halfNotPlayed = true;
@@ -135,6 +153,7 @@ function createResetButton(image,x,y){
 		quarterRestNotPlayed = true;
 		halfRestNotPlayed = true;
 		wholeRestNotPlayed = true;
+		playNotPressed = true;
 		notesPlayed = [];
 		lengthPlayed = [];
 		barOneCounter = 0;
@@ -160,7 +179,6 @@ function createInstructions(){
 	//add image items to itemflow
 	for (i=0; i < instructionList.length; i++) {
 		console.log("**instruction image list image: " + instructionList[i]);
-
 		var imageWidget = new MultiWidgets.ImageWidget();
 		imageWidget.load("images/"+instructionList[i]);
 		console.log("loaded image");
@@ -172,44 +190,63 @@ function createInstructions(){
 	flow.raiseToTop();
 }
 
-//function to change the color of lights when a note is placed
+//function to change the color of lights in the first bar when a note is placed
 function changeLightsBarOne(){
+	//placement of the first light
 	var x = root.width()*0.255;
+
+	//if the barOneCounter global variable counts too many beats per bar, turn all the lights red
 	if(barOneCounter > 8) {
 		for(i=0; i<=7; i++){
-		console.log("PLACEMENT: "+i);
 		addImage("rLED.png", x, root.height()*.65);
 		x += root.width()*.041;
 		}
 	}
+	//if the barOneCounter has the correct amount of beats, turn all the lights green
+	else if (barOneCounter == 8){
+		for(i=0; i<=7; i++){
+		addImage("gLED.png", x, root.height()*.65);
+		x += root.width()*.041;
+		}
+	}
+	//if the barOneCounter doesn't have enough beats, lights with filled beats turns yellow
 	else{	
 		for(i=0; i<barOneCounter; i++){
-			console.log("PLACEMENT: "+i);
-			addImage("gLED.png", x, root.height()*.65);
+			addImage("yLED.png", x, root.height()*.65);
 			x += root.width()*.041;
 		}
 	}	
 }
 
+//function to change the color of lights in the second bar when a note is placed
 function changeLightsBarTwo(){
-	var x = root.width()*0.583;
-	if(barTwoCounter > 8) {
+	//placement of the first light
+	var x = root.width()*0.255;
+
+	//if the barTwoCounter global variable counts too many beats per bar, turn all the lights red
+	if(barOneCounter > 8) {
 		for(i=0; i<=7; i++){
-		console.log("PLACEMENT: "+i);
 		addImage("rLED.png", x, root.height()*.65);
 		x += root.width()*.041;
 		}
 	}
-	else{	
-		for(i=0; i<barTwoCounter; i++){
-			console.log("PLACEMENT: "+i);
-			addImage("gLED.png", x, root.height()*.65);
-			x += root.width()*.041;
+	//if the barTwoCounter has the correct amount of beats, turn all the lights green
+	else if (barOneCounter == 8){
+		for(i=0; i<=7; i++){
+		addImage("gLED.png", x, root.height()*.65);
+		x += root.width()*.041;
 		}
 	}
+	//if the barTwoCounter doesn't have enough beats, lights with filled beats turns yellow
+	else{	
+		for(i=0; i<barOneCounter; i++){
+			addImage("yLED.png", x, root.height()*.65);
+			x += root.width()*.041;
+		}
+	}	
 }
 
-//function to set up initial unlit-lights under staff
+//function to set up initial unlit lights under staff
 function initializeLights(){
 	var x = root.width()*0.255;
 
@@ -225,11 +262,13 @@ function initializeLights(){
 function initializePlayButton(image){
 	w = new MultiWidgets.ImageWidget();	
 
+	//variables for the location of the play button
 	var LocX = root.width()*0.4;
 	var LocY = root.height()*.8;
 	var width = root.width()*.09;
 	var height = root.height()*.085;
 
+	//place the marker sensor on top of the play button
 	markerSensorPlay(LocX,LocY,height,width);
 
 	//load background image in and format
@@ -245,18 +284,14 @@ function initializePlayButton(image){
 	//check status of lit to determine if clicking "lights" or "unlights"
 	if (lit == false) {
 		w.onSingleTap(function(){
-			console.log("on single tap before reassign" + lit.toString());
 			lit = true;
-			console.log("after reassign" + lit.toString());
 			w.setSource("images/gPlay.png");
 		});
 			
 	}
-
 		else {
 			w.onSingleTap(function(){
-				console.log("unlight"); 
-				console.log("inside On single tap");
+				console.log("unlight");
 				w.setSource("images/play.png")});
 			lit = false;
 		}
@@ -264,9 +299,11 @@ function initializePlayButton(image){
 	return w;
 }
 
+//function to add light images from the image folder
 function addImage(image, x, y){
 	var w = new MultiWidgets.ImageWidget();
 
+	//raise images to top, set height and width, set fixed
 	if (w.load("images/"+image)) {
     	w.setHeight(35);
     	w.setWidth(35);
@@ -279,6 +316,7 @@ function addImage(image, x, y){
 	return w;
 }
 
+//function to add note images the correct distace from the marker sensor
 function addNoteImage(image, x, y){
 	var w = new MultiWidgets.ImageWidget();
 	if (w.load("images/"+image)) {
@@ -297,8 +335,7 @@ function audioPlay(file){
 	var sound = dsp.samplePlayer().playSample(file, 1.0, 1.0, 0, 0);
 }
 
-var playNotPressed = true;
-
+//function for behavior when play marker is placed on top of the sensor
 function markerSensorPlay(locationx, locationy, height, width){
 	var markerSensorPlay = new MultiWidgets.JavaScriptWidget();
 	//place marker sensor directly over the play button
@@ -314,6 +351,7 @@ function markerSensorPlay(locationx, locationy, height, width){
 		var gm = $.app.grabManager();
 		var marker = gm.findMarker(idAsInt);
 
+		//checking if its the correct marker code and the flag hasn't been set off
 		if(marker.code()==9 && playNotPressed){
 			console.log("**************** marker down: x: "+ marker.centerLocation().x+" y: "+marker.centerLocation().y+" *****************");
 			playNotPressed = false;
@@ -322,6 +360,8 @@ function markerSensorPlay(locationx, locationy, height, width){
 		}
 	});
 
+	//function for detecting when marker is lifted
+	//on marker up doesn't work too well
 	markerSensorPlay.onMarkerUp(function(id_as_string) {
 		var idAsInt = parseInt(id_as_string);
 		var gm = $.app.grabManager();
@@ -346,6 +386,7 @@ function markerSensorPlay(locationx, locationy, height, width){
 	// 8 whole rest brick
 	// 9 play water water
 
+	//function for marker sensor staff behavior
 	function markerSensorStaff(locationx, locationy, height, width){
 	console.log("Placing staff marker sensor...");
 	var markerSensorStaff = new MultiWidgets.JavaScriptWidget();
@@ -356,32 +397,48 @@ function markerSensorPlay(locationx, locationy, height, width){
 	markerSensorStaff.setBackgroundColor(0.0,0.0,0.0,0.0);
 	markerSensorStaff.setFixed();
 
+	//when the marker sensors are placed
 	markerSensorStaff.onMarkerDown(function(id_as_string) {
 		console.log("************************BAR COUNTER*****************************");
 		console.log(barOneCounter);
 		var idAsInt = parseInt(id_as_string);
 		var gm = $.app.grabManager();
 		var marker = gm.findMarker(idAsInt);
+
+		//if the marker sensors are either notes or rests
 		if(marker.code()==1 || marker.code()==2 || marker.code()==3 || marker.code()==4 || marker.code()==5 || marker.code()==6 || marker.code()==7 || marker.code()==8){
-			console.log("In Marker down");
+			
+			//check the marker code
 			console.log("Marker code is :"+marker.code());
 
+			//store the location of the markers
 			var xLoc = marker.centerLocation().x;
 			var yLoc = marker.centerLocation().y;
 
+			//log the location of the sensors
 			console.log("X LOCATION: "+xLoc);
 			console.log("Y LOCATION: "+yLoc);
 
+			//if a note if played and it is the coreect marker code
 			if(eighthNotPlayed && marker.code()==1){
+				//set the flag for the maker being placed
 				eighthNotPlayed = false;
+
+				//get which note and bar it is placed on
 				var eighthNote = getNote(yLoc);
 				var eighthBar = getBar(xLoc,yLoc);
+
+				//play the note sound
 				playNote(eighthNote,"eighth");
+
+				//push the note and length onto the arrays
 				notesPlayed.push(eighthNote);
 				lengthPlayed.push("eighth");
 
+				//place image of the note
 				eighthNoteImg = addNoteImage("eighthNote.png",xLoc,yLoc);
 
+				//change lights in the counter
 				if(eighthBar == "bar1"){
 					barOneCounter += 1;
 					changeLightsBarOne(barOneCounter);
@@ -393,15 +450,24 @@ function markerSensorPlay(locationx, locationy, height, width){
 			}
 
 			if(quarterNotPlayed && marker.code()==2){
+				//set the flag for the maker being placed
 				quarterNotPlayed = false;
+
+				//get which note and bar it is placed on
 				var quarterNote = getNote(yLoc);
 				var quarterBar = getBar(xLoc,yLoc);
+
+				//play the note sound
 				playNote(quarterNote,"quarter");
+
+				//push the note and length onto the arrays
 				notesPlayed.push(quarterNote);
 				lengthPlayed.push("quarter");
 
+				//place image of the note
 				quarterNoteImg = addNoteImage("quarterNote.png",xLoc,yLoc);
 
+				//change lights in the counter
 				if(quarterBar == "bar1"){
 					barOneCounter += 2;
 					changeLightsBarOne(barOneCounter);
@@ -414,15 +480,24 @@ function markerSensorPlay(locationx, locationy, height, width){
 			}
 
 			if(halfNotPlayed && marker.code()==3){
+				//set the flag for the maker being placed
 				halfNotPlayed = false;
+
+				//get which note and bar it is placed on
 				var halfNote = getNote(yLoc);
 				var halfBar = getBar(xLoc,yLoc);
+
+				//play the note sound
 				playNote(halfNote,"half");
+
+				//push the note and length onto the arrays
 				notesPlayed.push(halfNote);
 				lengthPlayed.push("half");
 
+				//place image of the note
 				halfNoteImg = addNoteImage("halfNote.png",xLoc,yLoc);
 
+				//change lights in the counter
 				if(halfBar == "bar1"){
 					barOneCounter += 4;
 					changeLightsBarOne(barOneCounter);
@@ -434,15 +509,24 @@ function markerSensorPlay(locationx, locationy, height, width){
 			}
 
 			if(wholeNotPlayed && marker.code()==4){
+				//set the flag for the maker being placed
 				wholeNotPlayed = false;
+
+				//get which note and bar it is placed on
 				var wholeNote = getNote(yLoc);
 				var wholeBar = getBar(xLoc,yLoc);
+
+				//play the note sound
 				playNote(wholeNote,"whole");
+
+				//push the note and length onto the arrays
 				notesPlayed.push(wholeNote);
 				lengthPlayed.push("whole");
 
+				//place image of the note
 				wholeNoteImg = addNoteImage("wholeNote.png",xLoc,yLoc);
 
+				//change lights in the counter
 				if(wholeBar == "bar1"){
 					barOneCounter += 8;
 					changeLightsBarOne(barOneCounter);
@@ -454,14 +538,23 @@ function markerSensorPlay(locationx, locationy, height, width){
 			}
 
 			if(eightRestNotPlayed && marker.code()==5){
+				//set the flag for the maker being placed
 				eightRestNotPlayed = false;
+
+				//play rest sound
 				playRest("eighth");
+
+				//get bar rest is placed on 
 				var eighthRestBar = getBar(xLoc,yLoc);
+
+				//push rest and length onto the arrays
 				notesPlayed.push("rest");
 				lengthPlayed.push("eighth");
 
+				//place image of the note
 				eighthRestImg = addNoteImage("eighthRest.png",xLoc,yLoc);
 
+				//change lights in the counter
 				if(eighthRestBar == "bar1"){
 					barOneCounter += 1;
 					changeLightsBarOne(barOneCounter);
@@ -473,14 +566,23 @@ function markerSensorPlay(locationx, locationy, height, width){
 			}
 
 			if(quarterRestNotPlayed && marker.code()==6){
+				//set the flag for the maker being placed
 				quarterRestNotPlayed = false;
+
+				//play rest sound
 				playRest("quarter");
+
+				//get bar rest is placed on 
 				var quarterRestBar = getBar(xLoc,yLoc);
+
+				//push rest and length onto the arrays
 				notesPlayed.push("rest");
 				lengthPlayed.push("quarter");
 
+				//place image of the note
 				quarterRestImg = addNoteImage("quarterRest.png",xLoc,yLoc);
 
+				//change lights in the counter
 				if(quarterRestBar == "bar1"){
 					barOneCounter += 2;
 					changeLightsBarOne(barOneCounter);
@@ -492,14 +594,23 @@ function markerSensorPlay(locationx, locationy, height, width){
 			}
 
 			if(halfRestNotPlayed && marker.code()==7){
+				//set the flag for the maker being placed
 				halfRestNotPlayed = false;
+
+				//play rest sound
 				playRest("half")
-				var halfRestBar = getBar(xLoc,yLoc);;
+
+				//get bar rest is placed on 
+				var halfRestBar = getBar(xLoc,yLoc);
+
+				//push rest and length onto the arrays
 				notesPlayed.push("rest");
 				lengthPlayed.push("half");
 
+				//place image of the note
 				halfRestImg = addNoteImage("halfRest.png",xLoc,yLoc);
 
+				//change lights in the counter
 				if(halfRestBar == "bar1"){
 					barOneCounter += 4;
 					changeLightsBarOne(barOneCounter);
@@ -511,14 +622,23 @@ function markerSensorPlay(locationx, locationy, height, width){
 			}
 
 			if(wholeRestNotPlayed && marker.code()==8){
+				//set the flag for the maker being placed
 				wholeRestNotPlayed = false;
+
+				//play rest sound
 				playRest("whole");
+				
+				//get bar rest is placed on 
 				var wholeRestBar = getBar(xLoc,yLoc);
+				
+				//push rest and length onto the arrays
 				notesPlayed.push("rest");
 				lengthPlayed.push("whole");
 
+				//place image of the note
 				wholeRestImg = addNoteImage("wholeRest.png",xLoc,yLoc);
 
+				//change lights in the counter
 				if(wholeRestBar == "bar1"){
 					barOneCounter += 8;
 					changeLightsBarOne(barOneCounter);
