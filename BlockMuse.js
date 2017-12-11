@@ -707,7 +707,7 @@ function markerSensorPlay(locationx, locationy, height, width){
 				var wholeNote = getNote(yLoc);
 				var wholeBar = getBar(xLoc,yLoc);
 
-				if (wholeNote=="Error") {
+				if (wholeBar=="Error") {
 					audioPlay("Notes/beep.wav");
 				}
 				else if(wholeBar=="bar1" && barOneCounter+8 >8){
@@ -1077,7 +1077,7 @@ function markerSensorPlay(locationx, locationy, height, width){
 		//bar lengths
 		var barStart = 500; //start of bar 1
 		var bar1 = 1100; //end of bar 1
-		var bar2 = 1800; //end of bar 2
+		var bar2 = 1750; //end of bar 2
 
 		if (xLoc > barStart && xLoc < bar1)
 		{
