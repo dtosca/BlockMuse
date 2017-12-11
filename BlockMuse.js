@@ -321,15 +321,30 @@ function addNoteImage(image, x, y){
 	var w = new MultiWidgets.ImageWidget();
 	if (w.load("images/"+image)) {
     	w.setLocation(x-100,y-300);
+    	w.setHeight(304);
+    	w.setWidth(170);
 	    root.addChild(w);
     	w.raiseToTop();
     	w.setFixed();
 	}
-
 	return w;
 }
 
-//call to resonant class to play sample
+//function to add images of rests in the center of the marker sensor
+function addRestImage(image,x,y){
+	var w = new MultiWidgets.ImageWidget();
+	if (w.load("images/"+image)) {
+    	w.setLocation(x-90,y-190);
+    	w.setHeight(304);
+    	w.setWidth(170);
+	    root.addChild(w);
+    	w.raiseToTop();
+    	w.setFixed();
+	}
+	return w;
+}
+
+//call to resonant class to play sample  
 function audioPlay(file){
 	console.log("Playing sample...");
 	var sound = dsp.samplePlayer().playSample(file, 1.0, 1.0, 0, 0);
@@ -376,15 +391,15 @@ function markerSensorPlay(locationx, locationy, height, width){
 	}
 
 	//note mappings for maker codes:
-	// 1 eighth note soil
-	// 2 quarter note carbon dioxide
-	// 3 half note biomass
-	// 4 whole note poop 
-	// 5 eight rest fuel
-	// 6 quarter rest nutrients
-	// 7 half rest oxygen
-	// 8 whole rest brick
-	// 9 play water water
+	// 1 eighth note
+	// 2 whole note
+	// 3 quarter note
+	// 4 eighth rest
+	// 5 half note
+	// 6 quarter note
+	// 7 half rest
+	// 8 whole rest
+	// 9 play
 
 	//function for marker sensor staff behavior
 	function markerSensorStaff(locationx, locationy, height, width){
@@ -449,7 +464,7 @@ function markerSensorPlay(locationx, locationy, height, width){
 				}
 			}
 
-			if(quarterNotPlayed && marker.code()==2){
+			if(quarterNotPlayed && marker.code()==3){
 				//set the flag for the maker being placed
 				quarterNotPlayed = false;
 
@@ -479,7 +494,7 @@ function markerSensorPlay(locationx, locationy, height, width){
 				}
 			}
 
-			if(halfNotPlayed && marker.code()==3){
+			if(halfNotPlayed && marker.code()==5){
 				//set the flag for the maker being placed
 				halfNotPlayed = false;
 
@@ -508,7 +523,7 @@ function markerSensorPlay(locationx, locationy, height, width){
 				}
 			}
 
-			if(wholeNotPlayed && marker.code()==4){
+			if(wholeNotPlayed && marker.code()==2){
 				//set the flag for the maker being placed
 				wholeNotPlayed = false;
 
@@ -537,7 +552,7 @@ function markerSensorPlay(locationx, locationy, height, width){
 				}
 			}
 
-			if(eightRestNotPlayed && marker.code()==5){
+			if(eightRestNotPlayed && marker.code()==4){
 				//set the flag for the maker being placed
 				eightRestNotPlayed = false;
 
@@ -552,7 +567,7 @@ function markerSensorPlay(locationx, locationy, height, width){
 				lengthPlayed.push("eighth");
 
 				//place image of the note
-				eighthRestImg = addNoteImage("eighthRest.png",xLoc,yLoc);
+				eighthRestImg = addRestImage("eighthRest.png",xLoc,yLoc);
 
 				//change lights in the counter
 				if(eighthRestBar == "bar1"){
@@ -580,7 +595,7 @@ function markerSensorPlay(locationx, locationy, height, width){
 				lengthPlayed.push("quarter");
 
 				//place image of the note
-				quarterRestImg = addNoteImage("quarterRest.png",xLoc,yLoc);
+				quarterRestImg = addRestImage("quarterRest.png",xLoc,yLoc);
 
 				//change lights in the counter
 				if(quarterRestBar == "bar1"){
@@ -608,7 +623,7 @@ function markerSensorPlay(locationx, locationy, height, width){
 				lengthPlayed.push("half");
 
 				//place image of the note
-				halfRestImg = addNoteImage("halfRest.png",xLoc,yLoc);
+				halfRestImg = addRestImage("halfRest.png",xLoc,yLoc);
 
 				//change lights in the counter
 				if(halfRestBar == "bar1"){
@@ -636,7 +651,7 @@ function markerSensorPlay(locationx, locationy, height, width){
 				lengthPlayed.push("whole");
 
 				//place image of the note
-				wholeRestImg = addNoteImage("wholeRest.png",xLoc,yLoc);
+				wholeRestImg = addRestImage("wholeRest.png",xLoc,yLoc);
 
 				//change lights in the counter
 				if(wholeRestBar == "bar1"){
@@ -651,10 +666,12 @@ function markerSensorPlay(locationx, locationy, height, width){
 		}
 	});
 
+	//add sensor to the root and raise to top
 	root.addChild(markerSensorStaff);
 	markerSensorStaff.raiseToTop();
 	}
 
+	//function for playing rest, with rest length as parameter
 	function playRest(restLength){
 		if(restLength == "eighth"){
 			audioPlay("Notes/8thRest.wav");
